@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,17 +12,22 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text HighScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
-
     
     // Start is called before the first frame update
     void Start()
     {
+        if (GameData.Instance != null)
+        {
+            HighScoreText.text = $"Player: {GameData.Instance.highScorePlayer} | High Score: {GameData.Instance.highScore}";
+        }
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -62,6 +68,7 @@ public class MainManager : MonoBehaviour
         }
     }
 
+
     void AddPoint(int point)
     {
         m_Points += point;
@@ -70,6 +77,15 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        int finalScore = m_Points;
+
+        if(finalScore > GameData.Instance.highScore)
+        {
+            GameData.Instance.highScore = finalScore;
+            GameData.Instance.highScorePlayer = GameData.Instance.playerName;
+            GameData.Instance.SaveHighScore();
+        }
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
